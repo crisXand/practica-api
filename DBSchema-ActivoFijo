@@ -1,0 +1,348 @@
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema activo_fijo
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema activo_fijo
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `activo_fijo` DEFAULT CHARACTER SET utf8 ;
+USE `activo_fijo` ;
+
+-- -----------------------------------------------------
+-- Table `activo_fijo`.`teams`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `activo_fijo`.`teams` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(45) NOT NULL,
+  `description` TEXT NULL,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `activo_fijo`.`workOrders`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `activo_fijo`.`workOrders` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `initdate` DATETIME NOT NULL,
+  `finishDate` DATETIME NOT NULL,
+  `state` ENUM('Active', 'Pending', 'Finish') NOT NULL,
+  `teams_id` INT NOT NULL,
+  `description` TEXT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_workOrders_teams1_idx` (`teams_id` ASC) VISIBLE,
+  CONSTRAINT `fk_workOrders_teams1`
+    FOREIGN KEY (`teams_id`)
+    REFERENCES `activo_fijo`.`teams` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `activo_fijo`.`bonusExtra`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `activo_fijo`.`bonusExtra` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(150) NOT NULL,
+  `amount` FLOAT NOT NULL,
+  `description` TEXT NOT NULL,
+  `type` ENUM('Comission', 'Bonus') NOT NULL,
+  `workOrders_id` INT NOT NULL,
+  PRIMARY KEY (`id`, `workOrders_id`),
+  INDEX `fk_bonusExtra_workOrders1_idx` (`workOrders_id` ASC) VISIBLE,
+  CONSTRAINT `fk_bonusExtra_workOrders1`
+    FOREIGN KEY (`workOrders_id`)
+    REFERENCES `activo_fijo`.`workOrders` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `activo_fijo`.`callBacks`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `activo_fijo`.`callBacks` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `issue` VARCHAR(150) NOT NULL,
+  `penaltyAmount` FLOAT NOT NULL,
+  `workOrders_id` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_callBacks_workOrders_idx` (`workOrders_id` ASC) VISIBLE,
+  CONSTRAINT `fk_callBacks_workOrders`
+    FOREIGN KEY (`workOrders_id`)
+    REFERENCES `activo_fijo`.`workOrders` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `activo_fijo`.`bonus`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `activo_fijo`.`bonus` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(45) NOT NULL,
+  `amount` FLOAT NOT NULL,
+  `workOrders_id` INT NOT NULL,
+  PRIMARY KEY (`id`, `workOrders_id`),
+  INDEX `fk_bonus_workOrders1_idx` (`workOrders_id` ASC) VISIBLE,
+  CONSTRAINT `fk_bonus_workOrders1`
+    FOREIGN KEY (`workOrders_id`)
+    REFERENCES `activo_fijo`.`workOrders` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `activo_fijo`.`persons`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `activo_fijo`.`persons` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(45) NOT NULL,
+  `last_name` VARCHAR(45) NOT NULL,
+  `phone` VARCHAR(45) NULL,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `activo_fijo`.`propertyDamages`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `activo_fijo`.`propertyDamages` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `description` TEXT NOT NULL,
+  `amount` FLOAT NOT NULL,
+  `workOrders_id` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_propertyDamages_workOrders1_idx` (`workOrders_id` ASC) VISIBLE,
+  CONSTRAINT `fk_propertyDamages_workOrders1`
+    FOREIGN KEY (`workOrders_id`)
+    REFERENCES `activo_fijo`.`workOrders` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `activo_fijo`.`reviews`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `activo_fijo`.`reviews` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `description` TEXT NOT NULL,
+  `type` ENUM('bad', 'good') NOT NULL,
+  `workOrders_id` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_reviews_workOrders1_idx` (`workOrders_id` ASC) VISIBLE,
+  CONSTRAINT `fk_reviews_workOrders1`
+    FOREIGN KEY (`workOrders_id`)
+    REFERENCES `activo_fijo`.`workOrders` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `activo_fijo`.`revenues`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `activo_fijo`.`revenues` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `revenue` FLOAT NOT NULL,
+  `workOrders_id` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_revenues_workOrders1_idx` (`workOrders_id` ASC) VISIBLE,
+  CONSTRAINT `fk_revenues_workOrders1`
+    FOREIGN KEY (`workOrders_id`)
+    REFERENCES `activo_fijo`.`workOrders` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `activo_fijo`.`teamPersons`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `activo_fijo`.`teamPersons` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `percentage` DOUBLE NOT NULL,
+  `teams_id` INT NOT NULL,
+  `persons_id` INT NOT NULL,
+  PRIMARY KEY (`id`, `persons_id`),
+  INDEX `fk_teamPersons_teams1_idx` (`teams_id` ASC) VISIBLE,
+  INDEX `fk_teamPersons_persons1_idx` (`persons_id` ASC) VISIBLE,
+  CONSTRAINT `fk_teamPersons_teams1`
+    FOREIGN KEY (`teams_id`)
+    REFERENCES `activo_fijo`.`teams` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_teamPersons_persons1`
+    FOREIGN KEY (`persons_id`)
+    REFERENCES `activo_fijo`.`persons` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `activo_fijo`.`areas_trabajo`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `activo_fijo`.`areas_trabajo` (
+  `id_areas_trabajo` INT NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(150) NOT NULL,
+  PRIMARY KEY (`id_areas_trabajo`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `activo_fijo`.`personas`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `activo_fijo`.`personas` (
+  `id_persona` INT NOT NULL AUTO_INCREMENT,
+  `nombres` VARCHAR(150) NOT NULL,
+  `n_carnet` VARCHAR(45) NOT NULL,
+  `areas_trabajo_id` INT NOT NULL,
+  PRIMARY KEY (`id_persona`),
+  INDEX `fk_personas_areas_trabajo1_idx` (`areas_trabajo_id` ASC) VISIBLE,
+  CONSTRAINT `fk_personas_areas_trabajo1`
+    FOREIGN KEY (`areas_trabajo_id`)
+    REFERENCES `activo_fijo`.`areas_trabajo` (`id_areas_trabajo`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `activo_fijo`.`tipo_activo`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `activo_fijo`.`tipo_activo` (
+  `id_tipo_activo` INT NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id_tipo_activo`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `activo_fijo`.`activos_fijos`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `activo_fijo`.`activos_fijos` (
+  `id_activo_fijo` INT NOT NULL AUTO_INCREMENT,
+  `codigo` VARCHAR(12) NOT NULL,
+  `tipo_activo_id` INT NOT NULL,
+  `descripcion` TEXT NOT NULL,
+  PRIMARY KEY (`id_activo_fijo`),
+  INDEX `fk_activos_fijos_tipo_activo1_idx` (`tipo_activo_id` ASC) VISIBLE,
+  CONSTRAINT `fk_activos_fijos_tipo_activo1`
+    FOREIGN KEY (`tipo_activo_id`)
+    REFERENCES `activo_fijo`.`tipo_activo` (`id_tipo_activo`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `activo_fijo`.`historial_asignaciones`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `activo_fijo`.`historial_asignaciones` (
+  `id_historial_asignaciones` INT NOT NULL AUTO_INCREMENT,
+  `fecha_asignacion` DATE NOT NULL,
+  `personas_id` INT NOT NULL,
+  `activos_fijos_id` INT NOT NULL,
+  PRIMARY KEY (`id_historial_asignaciones`),
+  INDEX `fk_historial_asignaciones_personas1_idx` (`personas_id` ASC) VISIBLE,
+  INDEX `fk_historial_asignaciones_activos_fijos1_idx` (`activos_fijos_id` ASC) VISIBLE,
+  CONSTRAINT `fk_historial_asignaciones_personas1`
+    FOREIGN KEY (`personas_id`)
+    REFERENCES `activo_fijo`.`personas` (`id_persona`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_historial_asignaciones_activos_fijos1`
+    FOREIGN KEY (`activos_fijos_id`)
+    REFERENCES `activo_fijo`.`activos_fijos` (`id_activo_fijo`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `activo_fijo`.`asignaciones`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `activo_fijo`.`asignaciones` (
+  `id_asignaciones` INT NOT NULL AUTO_INCREMENT,
+  `personas_id` INT NOT NULL,
+  `activos_fijos_id` INT NOT NULL,
+  PRIMARY KEY (`id_asignaciones`),
+  INDEX `fk_asignaciones_personas1_idx` (`personas_id` ASC) VISIBLE,
+  INDEX `fk_asignaciones_activos_fijos1_idx` (`activos_fijos_id` ASC) VISIBLE,
+  CONSTRAINT `fk_asignaciones_personas1`
+    FOREIGN KEY (`personas_id`)
+    REFERENCES `activo_fijo`.`personas` (`id_persona`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_asignaciones_activos_fijos1`
+    FOREIGN KEY (`activos_fijos_id`)
+    REFERENCES `activo_fijo`.`activos_fijos` (`id_activo_fijo`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+----------------------------------------------------------------
+
+INSERT INTO areas_trabajo(nombre) VALUES('Call center');
+INSERT INTO areas_trabajo(nombre) VALUES('Soporte cajeros');
+INSERT INTO areas_trabajo(nombre) VALUES('Desarrollo');
+INSERT INTO areas_trabajo(nombre) VALUES('Cumplimiento');
+INSERT INTO areas_trabajo(nombre) VALUES('Recursos humano');
+INSERT INTO areas_trabajo(nombre) VALUES('Contabilidad');
+INSERT INTO areas_trabajo(nombre) VALUES('Ventas');
+
+INSERT INTO personas(nombres, n_carnet, areas_trabajo_id)
+VALUES
+('Douglas Mejia', 'DM123', 3), 
+('Mariela Martinez', 'MM347', 3),
+('Edgar Garcia', 'EG676', 3),
+('Edward Moreno', 'EM346', 3),
+('Josue Rivas', 'JR794', 3),
+('Kevin Funes', 'KF233', 3),
+('Juan Perez', 'JP893', 1),
+('Pedro Perez', 'PP234', 1),
+('Juana Hernandez', 'JH234', 2),
+('Jose Sanchez', 'JS890', 2)
+;
+
+INSERT INTO tipo_activo(nombre)
+VALUES
+('Mouse'),
+('Monitor'),
+('Escritorio'),
+('Laptop'),
+('Librera'),
+('Silla'),
+('Pizarra'),
+('Teclado')
+;
+
+INSERT INTO activos_fijos(codigo, tipo_activo_id, descripcion) VALUES('LAV23287', 4, 'Laptop ASUS Vivobook');
+INSERT INTO activos_fijos(codigo, tipo_activo_id, descripcion) VALUES('LAV89923', 4, 'Laptop ASUS Vivobook');
+INSERT INTO activos_fijos(codigo, tipo_activo_id, descripcion) VALUES('M873', 4, 'Laptop ASUS Vivobook');
+INSERT INTO activos_fijos(codigo, tipo_activo_id, descripcion) VALUES('M398', 4, 'Laptop ASUS Vivobook');
+
+INSERT INTO asignaciones(personas_id, activos_fijos_id) VALUES(2, 2);
+INSERT INTO asignaciones(personas_id, activos_fijos_id) VALUES(3, 3);
+INSERT INTO asignaciones(personas_id, activos_fijos_id) VALUES(4, 1);
+
+INSERT INTO historial_asignaciones(personas_id, activos_fijos_id, fecha_asignacion) VALUES(1, 1, '2023-02-23');
+INSERT INTO historial_asignaciones(personas_id, activos_fijos_id, fecha_asignacion) VALUES(2, 2, '2023-05-12');
+INSERT INTO historial_asignaciones(personas_id, activos_fijos_id, fecha_asignacion) VALUES(3, 3, '2023-06-08');
+INSERT INTO historial_asignaciones(personas_id, activos_fijos_id, fecha_asignacion) VALUES(4, 1, '2023-09-21');
+
+-------------------------------------------------------------------
