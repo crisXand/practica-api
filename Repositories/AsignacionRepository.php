@@ -28,7 +28,7 @@ class AsignacionRepository{
             if($stm->rowCount() == 0){
                 throw new Exception("Type data is wrong");
             }
-            $asignacion["id"] = $this->conn->lastInsertId();
+            $asignacion["id_asignaciones"] = intval($this->conn->lastInsertId());
             return $asignacion;
             
         } catch (\Exception $e) {

@@ -18,7 +18,7 @@ class ActivoController{
             }
         }else{
             http_response_code(400);
-            echo json_encode(["message" => "Code is empty"]);
+            echo json_encode(["message" => 12]);
         }
     }
 

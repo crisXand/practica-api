@@ -7,7 +7,7 @@ class ProductRepository{
     public function get($code){
         $stm = $this->conn->prepare("SELECT * from activos_fijos WHERE codigo = ?");
         $stm->execute([$code]);
-        return $stm->fetchAll(PDO::FETCH_ASSOC);
+        return $stm->fetch(PDO::FETCH_ASSOC);
     }
 
     public function save($product){
@@ -19,7 +19,7 @@ class ProductRepository{
             if($stm->rowCount() == 0){
                 throw new Exception("Type data is wrong");
             }
-            $product["id"] = $this->conn->lastInsertId();
+            $product["id_activo_fijo"] = intval($this->conn->lastInsertId());
             return $product;
             
         } catch (\Exception $e) {

@@ -41,7 +41,7 @@ public function delete($param){
             echo json_encode($result);
         }else{
             http_response_code(404);
-            echo "Asignacion not found";
+            echo "Asignacion to activo {$param} not found";
         }
 
     }else{
